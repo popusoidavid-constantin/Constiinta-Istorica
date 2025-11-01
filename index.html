@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Conștiința Istorică</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .quiz-section {
+            display: none;
+        }
+
+        .quiz-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .results h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 20px 0;
+        }
+
+        .feedback {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Quiz: Conștiința Istorică</h1>
+
+        <div id="quiz"></div>
+
+        <div id="results" class="quiz-section results">
+            <h2>🎉 Quiz Finalizat!</h2>
+            <div class="score" id="score"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="btn" onclick="restartQuiz()">Reîncearcă Quiz-ul</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "1. Ce exprimă, în esență, conștiința istorică a unui individ sau a unei societăți?",
+                options: [
+                    "Cunoașterea exactă a tuturor datelor istorice",
+                    "Înțelegerea trecutului ca element formator al identității și orientării prezente",
+                    "Nevoia de a glorifica trecutul național",
+                    "Ignorarea influenței trecutului asupra prezentului"
+                ],
+                correct: 1
+            },
+            {
+                question: "2. Ce rol are educația istorică în procesul de formare a conștiinței istorice?",
+                options: [
+                    "Transmite doar informații cronologice despre evenimente",
+                    "Cultivă spiritul critic și capacitatea de interpretare a trecutului",
+                    "Încurajează acceptarea necritică a tradițiilor",
+                    "Se limitează la învățarea unor date și fapte"
+                ],
+                correct: 1
+            },
+            {
+                question: "3. Care dintre următoarele situații reflectă o societate cu o conștiință istorică dezvoltată?",
+                options: [
+                    "Ignorarea greșelilor trecutului",
+                    "Analiza critică a istoriei pentru a evita repetarea erorilor",
+                    "Manipularea trecutului în scopuri politice",
+                    "Respingerea tradițiilor culturale"
+                ],
+                correct: 1
+            },
+            {
+                question: "4. Ce pericol apare atunci când o comunitate își pierde conștiința istorică?",
+                options: [
+                    "Se dezvoltă mai rapid economic",
+                    "Devine mai tolerantă cultural",
+                    "Poate fi ușor manipulată și își pierde identitatea colectivă",
+                    "Câștigă autonomie politică sporită"
+                ],
+                correct: 2
+            },
+            {
+                question: "5. Cum contribuie memoria colectivă la formarea conștiinței istorice?",
+                options: [
+                    "Prin transmiterea valorilor și experiențelor comune care dau sens prezentului",
+                    "Prin înlocuirea studiului științific al istoriei",
+                    "Prin respingerea tradițiilor contradictorii",
+                    "Prin idealizarea exclusivă a trecutului național"
+                ],
+                correct: 0
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let shuffledQuestions = [];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function shuffleOptions(question) {
+            const correctAnswer = question.options[question.correct];
+            const shuffled = shuffleArray(question.options);
+            return {
+                ...question,
+                options: shuffled,
+                correct: shuffled.indexOf(correctAnswer)
+            };
+        }
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            shuffledQuestions = questions.map(q => shuffleOptions(q));
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            const question = shuffledQuestions[currentQuestion];
+
+            quizDiv.innerHTML = `
+                <div class="progress">Întrebarea ${currentQuestion + 1} din ${shuffledQuestions.length}</div>
+                <div class="question">
+                    <h3>${question.question}</h3>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option" onclick="selectOption(${index})">
+                                <input type="radio" name="answer" id="option${index}" value="${index}">
+                                <label for="option${index}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                    ${currentQuestion < shuffledQuestions.length - 1 ? 'Următoarea Întrebare' : 'Finalizează Quiz-ul'}
+                </button>
+            `;
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestion] = index;
+
+            // Remove checked state from all radio buttons
+            document.querySelectorAll('input[name="answer"]').forEach(radio => {
+                radio.checked = false;
+            });
+
+            // Check the selected radio button
+            document.getElementById(`option${index}`).checked = true;
+
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            const question = shuffledQuestions[currentQuestion];
+            const userAnswer = userAnswers[currentQuestion];
+
+            if (userAnswer === question.correct) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < shuffledQuestions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.add('active');
+
+            const percentage = Math.round((score / shuffledQuestions.length) * 100);
+            document.getElementById('score').textContent = `${score} / ${shuffledQuestions.length}`;
+
+            let feedback = '';
+            if (percentage === 100) {
+                feedback = 'Excelent! Ai înțeles perfect conceptul de conștiință istorică! 🌟';
+            } else if (percentage >= 80) {
+                feedback = 'Foarte bine! Ai o înțelegere solidă a subiectului! 👏';
+            } else if (percentage >= 60) {
+                feedback = 'Bine! Mai ai câteva aspecte de aprofundat. 📖';
+            } else {
+                feedback = 'Mai studiază puțin și încearcă din nou! 💪';
+            }
+
+            document.getElementById('feedback').textContent = feedback;
+        }
+
+        function restartQuiz() {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            startQuiz();
+        }
+
+        // Start quiz on load
+        startQuiz();
+    </script>
+</body>
+</html>
